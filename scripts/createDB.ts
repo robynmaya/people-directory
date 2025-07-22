@@ -74,14 +74,20 @@ async function main() {
 		);
 	`)
 
-	// Insert departments in correct order (parents first, then children)
 	const insertDepartment = db.prepare(`
 		INSERT OR REPLACE INTO departments (id, name, parent_id) 
 		VALUES (?, ?, ?)
 	`)
 
-	// Assuming department always has valid parent.id or null for root departments
-	// disable foreign keys, insert everything, re-enable after
+	// Team guarantees no orphaned references, making FK toggle safe from:
+	// • Invalid department_id references in people table
+	// • Invalid parent_id references in departments table
+	// • Circular dependencies in department hierarchy
+	// • Referential integrity violations that would break JOINs and queries
+	//
+	// Note: FK toggle is still NEEDED because HashiCorp's guarantee covers data validity,
+	// not insertion order. SQLite checks constraints immediately, so parents must exist
+	// before children, regardless of whether the references are ultimately valid.
 	db.pragma('foreign_keys = OFF')
 
 	for (const department of result.allDepartments) {
