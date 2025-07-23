@@ -4,10 +4,10 @@
  */
 
 import React, { useState } from 'react'
-import { executeQuery } from '@datocms/cda-client'
 import { GetStaticPropsResult } from 'next'
 import { PersonRecord, DepartmentNode, DepartmentTree, Department } from 'types'
 import BaseLayout from '../../layouts/base'
+import { getAllPeople, getAllDepartments } from 'lib/database'
 
 import {
 	filterPeople,
@@ -15,7 +15,6 @@ import {
 	departmentRecordsToDepartmentTree,
 	findChildrenDepartments,
 } from '../../utilities'
-import query from './query.graphql'
 
 import Profile from 'components/profile'
 import Search from 'components/search'
@@ -27,18 +26,11 @@ interface Props {
 }
 
 export async function getStaticProps(): Promise<GetStaticPropsResult<Props>> {
-	// Sr. candidate TODO: Load data from DB
-
-	const result = await executeQuery<{
-		allPeople: PersonRecord[]
-		allDepartments: DepartmentNode[]
-	}>(query, {
-		token: `${process.env.DATO_API_TOKEN}`,
-	})
+	// Sr. candidate TODO: Load data from DB ✅
 
 	const data = {
-		allPeople: result.allPeople,
-		allDepartments: result.allDepartments,
+		allPeople: getAllPeople(),
+		allDepartments: getAllDepartments(),
 	}
 
 	return {
