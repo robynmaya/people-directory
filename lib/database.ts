@@ -47,23 +47,23 @@ function transformRowToPerson(row: any): PersonRecord | null {
 
 	return person
 }
+
 /**
  * Get all people from the database
  */
-
 export function getAllPeople(): PersonRecord[] {
 	const db = getDatabase()
 
 	const rows = db
 		.prepare(
 			`
-		SELECT 
-			p.id, p.name, p.title, p.avatar_url,
-			d.id as dept_id, d.name as dept_name
-		FROM people p
-		LEFT JOIN departments d ON p.department_id = d.id
-		ORDER BY p.name
-	`
+			SELECT 
+				p.id, p.name, p.title, p.avatar_url,
+				d.id as dept_id, d.name as dept_name
+			FROM people p
+			LEFT JOIN departments d ON p.department_id = d.id
+			ORDER BY p.name
+		`
 		)
 		.all()
 
@@ -73,18 +73,17 @@ export function getAllPeople(): PersonRecord[] {
 /**
  * Get all departments from the database
  */
-
 export function getAllDepartments(): DepartmentNode[] {
 	const db = getDatabase()
 
 	const rows = db
 		.prepare(
 			`
-		SELECT
-			id, name, parent_id
-		FROM departments
-		ORDER BY name
-	`
+			SELECT
+				id, name, parent_id
+			FROM departments
+			ORDER BY name
+		`
 		)
 		.all()
 
@@ -98,24 +97,25 @@ export function getAllDepartments(): DepartmentNode[] {
 /**
  * Search people by name (requirement doesn't say by title or other person attributes)
  */
-
 export function searchPeople(searchTerm: string): PersonRecord[] {
 	const db = getDatabase()
+
 	if (!searchTerm.trim()) {
 		return []
 	}
+
 	const rows = db
 		.prepare(
 			`
-		SELECT
-			p.id, p.name, p.title, p.avatar_url,
-			d.id as dept_id, d.name as dept_name
-		FROM people p
-		LEFT JOIN departments d ON p.department_id = d.id
-		WHERE p.name LIKE ?
-		ORDER BY p.name
-		LIMIT 100
-	`
+			SELECT
+				p.id, p.name, p.title, p.avatar_url,
+				d.id as dept_id, d.name as dept_name
+			FROM people p
+			LEFT JOIN departments d ON p.department_id = d.id
+			WHERE p.name LIKE ?
+			ORDER BY p.name
+			LIMIT 100
+		`
 		)
 		.all(`%${searchTerm}%`)
 
