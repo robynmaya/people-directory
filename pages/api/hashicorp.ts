@@ -16,10 +16,10 @@ export default function handler(
 	res: NextApiResponse<ResponseData>
 ) {
 	try {
-		const { query } = req // apiParams
+		const { query } = req // params from fetchPeople, department param is not used
 		const searchedNameParam = (query.search as string) || ''
 		const departmentIdsParam = (query.departmentIds as string) || ''
-		const avatarParam = (query.avatar as string) || ''
+		const hasImageParam = (query.hasImage as string) || ''
 
 		// Sr. candidate TODO: Perform DB query and return the result ✅
 
@@ -32,7 +32,7 @@ export default function handler(
 			results = getAllPeople()
 		}
 
-		if (avatarParam === 'required') {
+		if (hasImageParam === 'required') {
 			results = results.filter((person) => person.avatar?.url)
 		}
 

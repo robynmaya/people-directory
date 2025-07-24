@@ -5,12 +5,14 @@
 
 export interface SearchProps {
 	value: string
+	hideNoPicture: boolean
 	onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 	onProfileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 export default function Search({
 	value,
+	hideNoPicture,
 	onInputChange,
 	onProfileChange,
 }: SearchProps) {
@@ -24,7 +26,11 @@ export default function Search({
 			/>
 
 			<div>
-				<input type="checkbox" onChange={onProfileChange} />
+				<input
+					type="checkbox"
+					checked={hideNoPicture}
+					onChange={onProfileChange}
+				/>
 				<div>Hide people missing a profile image</div>
 			</div>
 		</>

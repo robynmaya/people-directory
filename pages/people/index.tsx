@@ -58,7 +58,7 @@ export default function PeoplePage({
 		if (!router.isReady) {
 			return
 		}
-		const { search, department } = router.query
+		const { search, department, hasImage } = router.query
 
 		// Set initial state from URL query
 		if (search) {
@@ -81,6 +81,9 @@ export default function PeoplePage({
 				setFilteredDepartments(departmentPath)
 			}
 		}
+		if (hasImage === 'required') {
+			setHideNoPicture(true)
+		}
 	}, [router.isReady, router.query])
 
 	useEffect(() => {
@@ -98,45 +101,46 @@ export default function PeoplePage({
 
 		// Function to fetch and update people via API when filtering
 		const fetchPeople = async () => {
-			// Build query params
-			const queryParams = new URLSearchParams() // for URL (human-readable)
-			const apiParams = new URLSearchParams()
+			/* Flow:
+			 * 1. Build params with URL-friendly parameters (search, hasImage, department name)
+			 * 2. Update URL first with clean user-facing parameters
+			 * 3. Then add API-specific departmentIds to same params instance
+			 * 4. Pass the combined params in the API call
+			 */
+			const params = new URLSearchParams()
 
-			// Add same search params to both URL and API
 			if (searchingName) {
-				queryParams.set('search', searchingName)
-				apiParams.set('search', searchingName)
+				params.set('search', searchingName)
 			}
 
-			// Add avatar filter to API (not URL for UX reasons)
 			if (hideNoPicture) {
-				apiParams.set('avatar', 'required')
+				params.set('hasImage', 'required')
 			}
 
-			// Add different department params to URL and API
 			if (filteredDepartments.length > 0) {
 				const selectedDept = filteredDepartments.at(-1)
+				params.set('department', selectedDept.name)
+			}
 
-				// URL gets human-readable department name
-				queryParams.set('department', selectedDept.name)
+			// Sr. candidate TODO: Update URL based on search and department filters ✅
+			// URL shows search, department, hasImage
+			const urlPath = `/people${params.toString() && `?${params}`}`
+			router.replace(urlPath, undefined, { shallow: true })
 
-				// API gets department hierarchy IDs for proper filtering
+			if (filteredDepartments.length > 0) {
+				const selectedDept = filteredDepartments.at(-1)
+				// Contains the selected department AND all its downward children/descendants
+				// This is for inclusive filtering - show people from the selected dept AND all teams under it
 				const childDepartments = findChildrenDepartments(
 					departmentTree,
 					selectedDept.id
 				)
 				const departmentIds = childDepartments.map((dept) => dept.id).join(',')
-				apiParams.set('departmentIds', departmentIds)
+				params.set('departmentIds', departmentIds)
 			}
 
-			// Sr. candidate TODO: Update URL based on search and department filters ✅
-			// Second param is optional route masking, no need
-			// Shallow set to true to prevent full page reload
-			const urlPath = `/people${queryParams.toString() && `?${queryParams}`}`
-			router.replace(urlPath, undefined, { shallow: true })
-
 			try {
-				const response = await fetch(`/api/hashicorp?${apiParams}`)
+				const response = await fetch(`/api/hashicorp?${params}`) // send combined params, but API doesn't need dept, only dept ids
 				const data = await response.json()
 				setPeopleResults(data.results)
 			} catch (error) {
@@ -170,6 +174,7 @@ export default function PeoplePage({
 				</div>
 				<Search
 					value={searchingName}
+					hideNoPicture={hideNoPicture}
 					onInputChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 						setSearchingName(e.target.value)
 					}}
@@ -186,11 +191,11 @@ export default function PeoplePage({
 							setFilteredDepartments([])
 						}}
 						selectFilterHandler={(departmentFilter: Department) => {
-							const totalDepartmentFilter = findDepartments(
-								departmentTree,
-								departmentFilter.id
+							// Full hierarchical path from root down to selected department for breadcrumb
+							// eg select QA, gives array: [RootDept, ParentDept, QA]
+							setFilteredDepartments(
+								findDepartments(departmentTree, departmentFilter.id)
 							)
-							setFilteredDepartments(totalDepartmentFilter)
 						}}
 						departmentTree={departmentTree}
 					/>
