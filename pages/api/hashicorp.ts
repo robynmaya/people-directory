@@ -5,7 +5,7 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { PersonRecord } from 'types'
-import { searchPeople } from '../../lib/database'
+import { searchPeople, getAllPeople } from '../../lib/database'
 
 type ResponseData = {
 	results: PersonRecord[]
@@ -17,29 +17,27 @@ export default function handler(
 ) {
 	try {
 		const { query } = req
-		const searchParam = (query.search as string) || ''
-		const departmentParam = (query.department as string) || ''
-		const avatarParam = (query.avatar as string) || ''
+		const searchedNameParam = (query.search as string) || ''
+		const departmentIdsParam = (query.departmentIds as string) || ''
 
 		// Sr. candidate TODO: Perform DB query and return the result ✅
 
-		// Query the db by name using the searchPeople service
-		let results = searchPeople(searchParam)
+		// Get people based on search term
+		let results: PersonRecord[]
+		if (searchedNameParam) {
+			results = searchPeople(searchedNameParam)
+		} else {
+			// No name searched, get all people (for department-only filtering)
+			results = getAllPeople()
+		}
 
-		// Filter by department if provided
-		if (departmentParam) {
+		// Show matched people in selected department AND all its sub-departments
+		if (departmentIdsParam) {
+			const allowedDepartmentIds = departmentIdsParam.split(',')
 			results = results.filter((person) =>
-				person.department?.name
-					?.toLowerCase()
-					.includes(departmentParam.toLowerCase())
+				allowedDepartmentIds.includes(person.department?.id || '')
 			)
 		}
-
-		// Filter by avatar presence if provided
-		if (avatarParam === 'required') {
-			results = results.filter((person) => person.avatar?.url)
-		}
-
 		res.status(200).json({ results })
 	} catch (error) {
 		console.error('API Error:', error)
