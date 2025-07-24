@@ -52,7 +52,6 @@ export default function PeoplePage({
 	const [hideNoPicture, setHideNoPicture] = useState(false)
 	const [filteredDepartments, setFilteredDepartments] = useState([]) //  hierarchical path, last is selected dept
 	const [isInitialized, setIsInitialized] = useState(false)
-	const [isLoading, setIsLoading] = useState(false)
 
 	// Initialize state from URL on page load in case bookmarked
 	// As per requirement, avatar is not in URL
@@ -98,14 +97,10 @@ export default function PeoplePage({
 		// If no filters at all, show all people from getStaticProps
 		if (!searchingName && filteredDepartments.length === 0 && !hideNoPicture) {
 			setPeopleResults(allPeople)
-			setIsLoading(false)
 			// Update URL to clear any previous params
 			router.replace('/people', undefined, { shallow: true })
 			return
 		}
-
-		// Only show loading when we're actually making an API call
-		setIsLoading(true)
 
 		// Function to fetch and update people via API when filtering
 		const fetchPeople = async () => {
@@ -151,11 +146,9 @@ export default function PeoplePage({
 				const response = await fetch(`/api/hashicorp?${params}`) // send combined params, but API doesn't need dept, only dept ids
 				const data = await response.json()
 				setPeopleResults(data.results)
-				setIsLoading(false)
 			} catch (error) {
 				console.error('Failed to fetch people:', error)
 				setPeopleResults([])
-				setIsLoading(false)
 			}
 		}
 
@@ -213,11 +206,7 @@ export default function PeoplePage({
 					/>
 				</aside>
 				<ul>
-					{isLoading ? (
-						<div>
-							<span>Loading...</span>
-						</div>
-					) : peopleResults.length === 0 ? (
+					{peopleResults.length === 0 ? (
 						<div>
 							<span>No results found.</span>
 						</div>
