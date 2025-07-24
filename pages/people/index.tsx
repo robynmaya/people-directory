@@ -11,7 +11,6 @@ import BaseLayout from '../../layouts/base'
 import { getAllPeople, getAllDepartments } from 'lib/database'
 
 import {
-	filterPeople,
 	findDepartments,
 	departmentRecordsToDepartmentTree,
 	findChildrenDepartments,
@@ -48,6 +47,7 @@ export default function PeoplePage({
 	departmentTree,
 }: Props): React.ReactElement {
 	const router = useRouter()
+	const [peopleResults, setPeopleResults] = useState<PersonRecord[]>(allPeople)
 	const [searchingName, setSearchingName] = useState('')
 	const [hideNoPicture, setHideNoPicture] = useState(false)
 	const [filteredDepartments, setFilteredDepartments] = useState([]) //  hierarchical path, last is selected dept
@@ -83,26 +83,76 @@ export default function PeoplePage({
 		}
 	}, [router.isReady, router.query])
 
-	// TODO - Separate useEffect to debounce:
-	// Fetch new search result when any of searchingName, hideNoPicture, filteredDepartments states change
-	// Update URL
+	useEffect(() => {
+		if (!router.isReady) {
+			return
+		}
 
-	const peopleFiltered = filterPeople(
-		allPeople,
-		searchingName,
-		hideNoPicture,
-		findChildrenDepartments(
-			departmentTree,
-			filteredDepartments[filteredDepartments.length - 1]?.id || []
-		)
-	)
+		// If no search or department filters, show all people from getStaticProps
+		if (!searchingName && filteredDepartments.length === 0) {
+			setPeopleResults(allPeople)
+			// Update URL to clear any previous params
+			router.replace('/people', undefined, { shallow: true })
+			return
+		}
+
+		// Function to fetch and update people via API when filtering
+		const fetchPeople = async () => {
+			// Build query params
+			const queryParams = new URLSearchParams() // for URL (human-readable)
+			const apiParams = new URLSearchParams()
+
+			// Add same search params to both URL and API
+			if (searchingName) {
+				queryParams.set('search', searchingName)
+				apiParams.set('search', searchingName)
+			}
+
+			// Add different department params to URL and API
+			if (filteredDepartments.length > 0) {
+				const selectedDept = filteredDepartments.at(-1)
+
+				// URL gets human-readable department name
+				queryParams.set('department', selectedDept.name)
+
+				// API gets department hierarchy IDs for proper filtering
+				const childDepartments = findChildrenDepartments(
+					departmentTree,
+					selectedDept.id
+				)
+				const departmentIds = childDepartments.map((dept) => dept.id).join(',')
+				apiParams.set('departmentIds', departmentIds)
+			}
+
+			// Sr. candidate TODO: Update URL based on search and department filters ✅
+			// Second param is optional route masking, no need
+			// Shallow set to true to prevent full page reload
+			router.replace(`/people?${queryParams}`, undefined, { shallow: true })
+
+			try {
+				const response = await fetch(`/api/hashicorp?${apiParams}`)
+				const data = await response.json()
+				setPeopleResults(data.results)
+			} catch (error) {
+				console.error('Failed to fetch people:', error)
+				setPeopleResults([])
+			}
+		}
+
+		// Debounce API calls for user input
+		const timeoutId = setTimeout(fetchPeople, 500)
+		return () => clearTimeout(timeoutId)
+	}, [searchingName, filteredDepartments, router.isReady, allPeople])
+
+	// Apply client-side avatar filter to API results
+	const displayedPeople = hideNoPicture
+		? peopleResults.filter((person) => person.avatar?.url)
+		: peopleResults
 
 	const filteredDepartmentIds = filteredDepartments.reduce(
 		(acc: string[], department: DepartmentNode) => [...acc, department.id],
 		[]
 	)
-
-	// Sr. candidate TODO: Update URL based on search and department filters
 
 	return (
 		<main className="g-grid-container">
@@ -143,12 +193,12 @@ export default function PeoplePage({
 					/>
 				</aside>
 				<ul>
-					{peopleFiltered.length === 0 && (
+					{displayedPeople.length === 0 && (
 						<div>
 							<span>No results found.</span>
 						</div>
 					)}
-					{peopleFiltered.map((person: PersonRecord) => {
+					{displayedPeople.map((person: PersonRecord) => {
 						return (
 							<li key={person.id}>
 								<Profile
