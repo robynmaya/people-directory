@@ -162,6 +162,7 @@ export default function PeoplePage({
 					<span>Find a HashiCorp human</span>
 				</div>
 				<Search
+					value={searchingName}
 					onInputChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 						setSearchingName(e.target.value)
 						/**
@@ -204,8 +205,8 @@ export default function PeoplePage({
 								<Profile
 									imgUrl={person.avatar?.url}
 									name={person.name}
-									title={person.title}
-									department={person.department?.name}
+									title={person.title || 'No title'}
+									department={person.department?.name || 'No department'}
 								/>
 							</li>
 						)

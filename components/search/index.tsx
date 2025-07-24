@@ -4,11 +4,13 @@
  */
 
 export interface SearchProps {
+	value: string
 	onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 	onProfileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 export default function Search({
+	value,
 	onInputChange,
 	onProfileChange,
 }: SearchProps) {
@@ -17,6 +19,7 @@ export default function Search({
 			<input
 				type="text"
 				placeholder="Search people by name"
+				value={value}
 				onChange={onInputChange}
 			/>
 
