@@ -16,9 +16,10 @@ export default function handler(
 	res: NextApiResponse<ResponseData>
 ) {
 	try {
-		const { query } = req
+		const { query } = req // apiParams
 		const searchedNameParam = (query.search as string) || ''
 		const departmentIdsParam = (query.departmentIds as string) || ''
+		const avatarParam = (query.avatar as string) || ''
 
 		// Sr. candidate TODO: Perform DB query and return the result ✅
 
@@ -29,6 +30,10 @@ export default function handler(
 		} else {
 			// No name searched, get all people (for department-only filtering)
 			results = getAllPeople()
+		}
+
+		if (avatarParam === 'required') {
+			results = results.filter((person) => person.avatar?.url)
 		}
 
 		// Show matched people in selected department AND all its sub-departments

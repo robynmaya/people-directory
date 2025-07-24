@@ -88,8 +88,8 @@ export default function PeoplePage({
 			return
 		}
 
-		// If no search or department filters, show all people from getStaticProps
-		if (!searchingName && filteredDepartments.length === 0) {
+		// If no filters at all, show all people from getStaticProps
+		if (!searchingName && filteredDepartments.length === 0 && !hideNoPicture) {
 			setPeopleResults(allPeople)
 			// Update URL to clear any previous params
 			router.replace('/people', undefined, { shallow: true })
@@ -106,6 +106,11 @@ export default function PeoplePage({
 			if (searchingName) {
 				queryParams.set('search', searchingName)
 				apiParams.set('search', searchingName)
+			}
+
+			// Add avatar filter to API (not URL for UX reasons)
+			if (hideNoPicture) {
+				apiParams.set('avatar', 'required')
 			}
 
 			// Add different department params to URL and API
@@ -127,7 +132,8 @@ export default function PeoplePage({
 			// Sr. candidate TODO: Update URL based on search and department filters ✅
 			// Second param is optional route masking, no need
 			// Shallow set to true to prevent full page reload
-			router.replace(`/people?${queryParams}`, undefined, { shallow: true })
+			const urlPath = `/people${queryParams.toString() && `?${queryParams}`}`
+			router.replace(urlPath, undefined, { shallow: true })
 
 			try {
 				const response = await fetch(`/api/hashicorp?${apiParams}`)
@@ -142,12 +148,13 @@ export default function PeoplePage({
 		// Debounce API calls for user input
 		const timeoutId = setTimeout(fetchPeople, 500)
 		return () => clearTimeout(timeoutId)
-	}, [searchingName, filteredDepartments, router.isReady, allPeople])
-
-	// Apply client-side avatar filter to API results
-	const displayedPeople = hideNoPicture
-		? peopleResults.filter((person) => person.avatar?.url)
-		: peopleResults
+	}, [
+		searchingName,
+		filteredDepartments,
+		router.isReady,
+		allPeople,
+		hideNoPicture,
+	])
 
 	const filteredDepartmentIds = filteredDepartments.reduce(
 		(acc: string[], department: DepartmentNode) => [...acc, department.id],
@@ -189,12 +196,12 @@ export default function PeoplePage({
 					/>
 				</aside>
 				<ul>
-					{displayedPeople.length === 0 && (
+					{peopleResults.length === 0 && (
 						<div>
 							<span>No results found.</span>
 						</div>
 					)}
-					{displayedPeople.map((person: PersonRecord) => {
+					{peopleResults.map((person: PersonRecord) => {
 						return (
 							<li key={person.id}>
 								<Profile
