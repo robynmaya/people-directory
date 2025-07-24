@@ -137,3 +137,24 @@ export const findChildrenDepartments = (
 
 	return foundDepartments
 }
+
+// AI-assisted: Created this helper function to find department by name for URL initialization
+// (Time constraint - needed quick implementation to convert URL query param to department object)
+export const findDepartmentByName = (
+	departmentTree: DepartmentTree,
+	departmentName: string
+): Department | null => {
+	for (const department of departmentTree) {
+		if (department.name.toLowerCase() === departmentName.toLowerCase()) {
+			return { id: department.id, name: department.name }
+		}
+		// Recursively search children
+		if (department.children && department.children.length > 0) {
+			const found = findDepartmentByName(department.children, departmentName)
+			if (found) {
+				return found
+			}
+		}
+	}
+	return null
+}

@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: MPL-2.0
  */
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { GetStaticPropsResult } from 'next'
+import { useRouter } from 'next/router'
 import { PersonRecord, DepartmentNode, DepartmentTree, Department } from 'types'
 import BaseLayout from '../../layouts/base'
 import { getAllPeople, getAllDepartments } from 'lib/database'
@@ -14,6 +15,7 @@ import {
 	findDepartments,
 	departmentRecordsToDepartmentTree,
 	findChildrenDepartments,
+	findDepartmentByName,
 } from '../../utilities'
 
 import Profile from 'components/profile'
@@ -45,9 +47,45 @@ export default function PeoplePage({
 	allPeople,
 	departmentTree,
 }: Props): React.ReactElement {
+	const router = useRouter()
 	const [searchingName, setSearchingName] = useState('')
 	const [hideNoPicture, setHideNoPicture] = useState(false)
-	const [filteredDepartments, setFilteredDepartments] = useState([])
+	const [filteredDepartments, setFilteredDepartments] = useState([]) //  hierarchical path, last is selected dept
+
+	// Initialize state from URL on page load in case bookmarked
+	// As per requirement, avatar is not in URL
+	useEffect(() => {
+		if (!router.isReady) {
+			return
+		}
+		const { search, department } = router.query
+
+		// Set initial state from URL query
+		if (search) {
+			setSearchingName(search as string)
+		}
+		if (department) {
+			// Department query param is always a single string because selection only allows 1 department
+			// findDepartments gives the full hierarchical path from root to selected department
+			// Returns array where index represents tree depth: [root, level2, level3, ...]
+			// e.g., ["Engineering", "Backend", "API Team"] for nested selection
+			const foundDepartment = findDepartmentByName(
+				departmentTree,
+				department as string
+			)
+			if (foundDepartment) {
+				const departmentPath = findDepartments(
+					departmentTree,
+					foundDepartment.id
+				)
+				setFilteredDepartments(departmentPath)
+			}
+		}
+	}, [router.isReady, router.query])
+
+	// TODO - Separate useEffect to debounce:
+	// Fetch new search result when any of searchingName, hideNoPicture, filteredDepartments states change
+	// Update URL
 
 	const peopleFiltered = filterPeople(
 		allPeople,
@@ -117,7 +155,7 @@ export default function PeoplePage({
 									imgUrl={person.avatar?.url}
 									name={person.name}
 									title={person.title}
-									department={person.department.name}
+									department={person.department?.name}
 								/>
 							</li>
 						)
