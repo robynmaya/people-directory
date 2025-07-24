@@ -124,7 +124,7 @@ export default function PeoplePage({
 
 			// Sr. candidate TODO: Update URL based on search and department filters ✅
 			// URL shows search, department, hasImage
-			const urlPath = `/people${params.toString() && `?${params}`}`
+			const urlPath = `/people?${params}`
 			router.replace(urlPath, undefined, { shallow: true })
 
 			if (filteredDepartments.length > 0) {
