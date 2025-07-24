@@ -24,7 +24,7 @@ export default function Search({
 			/>
 
 			<div>
-				<input type="button" onChange={onProfileChange} />
+				<input type="checkbox" onChange={onProfileChange} />
 				<div>Hide people missing a profile image</div>
 			</div>
 		</>

@@ -165,11 +165,6 @@ export default function PeoplePage({
 					value={searchingName}
 					onInputChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 						setSearchingName(e.target.value)
-						/**
-						 * Sr. candidate TODO: Hit the API to search for people
-						 * You can use the following URL to hit the API
-						 * /api/hashicorp?search=...
-						 */
 					}}
 					onProfileChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 						setHideNoPicture(e.target.checked)
