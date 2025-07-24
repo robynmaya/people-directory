@@ -49,11 +49,11 @@ function transformRowToPerson(row: any): PersonRecord | null {
 }
 
 /**
- * Internal helper to get people with optional filters
+ * Get all people from the database with optional filters
  */
-function getPeopleWithFilters(
+export function getAllPeople(
 	whereClause?: string,
-	params?: any[]
+	param?: string
 ): PersonRecord[] {
 	const db = getDatabase()
 
@@ -68,18 +68,11 @@ function getPeopleWithFilters(
 		LIMIT 100
 	`
 
-	const rows = params
-		? db.prepare(baseQuery).all(...params)
+	const rows = param
+		? db.prepare(baseQuery).all(param)
 		: db.prepare(baseQuery).all()
 
 	return rows.map(transformRowToPerson).filter(Boolean) as PersonRecord[]
-}
-
-/**
- * Get all people from the database
- */
-export function getAllPeople(): PersonRecord[] {
-	return getPeopleWithFilters()
 }
 
 /**
@@ -114,5 +107,5 @@ export function searchPeople(searchTerm: string): PersonRecord[] {
 		return []
 	}
 
-	return getPeopleWithFilters('WHERE p.name LIKE ?', [`%${searchTerm}%`])
+	return getAllPeople('WHERE p.name LIKE ?', `%${searchTerm}%`)
 }
