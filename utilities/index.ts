@@ -23,7 +23,7 @@ export const buildChildren = (
 	)
 }
 
-// TODO: There is a bug in this function that is causing the DepartmentFilter component to not render correctly
+// TODO: There is a bug in this function that is causing the DepartmentFilter component to not render correctly ✅
 export const departmentRecordsToDepartmentTree = (
 	departments: DepartmentNode[]
 ): DepartmentRecord[] => {
@@ -38,45 +38,15 @@ export const departmentRecordsToDepartmentTree = (
 				listWithChildren[currentItemParentId].children.push(
 					currentItemWithChildren
 				)
+			} else {
+				// If no parent, this is a root level department - add to nestedList
+				nestedList.push(currentItemWithChildren)
 			}
 
 			return nestedList
 		},
 		[] as DepartmentRecord[]
 	)
-}
-
-export const filterPeople = (
-	allPeople: PersonRecord[],
-	filteredName: string,
-	filterByPicture: boolean,
-	filteredDepartments: Department[]
-) => {
-	return allPeople.filter((person: PersonRecord) => {
-		if (filterByPicture && person.avatar?.url == null) {
-			return false
-		} else if (
-			filteredName !== '' &&
-			!person.name.toLowerCase().includes(filteredName.toLowerCase())
-		) {
-			return false
-		} else if (
-			filteredDepartments.length !== 0 &&
-			!filteredDepartments
-				.reduce(
-					(acc: string[], department: DepartmentNode) => [
-						...acc,
-						department.name,
-					],
-					[]
-				)
-				.includes(person.department.name)
-		) {
-			return false
-		}
-
-		return true
-	})
 }
 
 export const findDepartments = (
