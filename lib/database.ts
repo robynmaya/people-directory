@@ -49,25 +49,37 @@ function transformRowToPerson(row: any): PersonRecord | null {
 }
 
 /**
+ * Internal helper to get people with optional filters
+ */
+function getPeopleWithFilters(
+	whereClause?: string,
+	params?: any[]
+): PersonRecord[] {
+	const db = getDatabase()
+
+	const baseQuery = `
+		SELECT 
+			p.id, p.name, p.title, p.avatar_url,
+			d.id as dept_id, d.name as dept_name
+		FROM people p
+		LEFT JOIN departments d ON p.department_id = d.id
+		${whereClause || ''}
+		ORDER BY p.name
+		LIMIT 100
+	`
+
+	const rows = params
+		? db.prepare(baseQuery).all(...params)
+		: db.prepare(baseQuery).all()
+
+	return rows.map(transformRowToPerson).filter(Boolean) as PersonRecord[]
+}
+
+/**
  * Get all people from the database
  */
 export function getAllPeople(): PersonRecord[] {
-	const db = getDatabase()
-
-	const rows = db
-		.prepare(
-			`
-			SELECT 
-				p.id, p.name, p.title, p.avatar_url,
-				d.id as dept_id, d.name as dept_name
-			FROM people p
-			LEFT JOIN departments d ON p.department_id = d.id
-			ORDER BY p.name
-		`
-		)
-		.all()
-
-	return rows.map(transformRowToPerson).filter(Boolean) as PersonRecord[]
+	return getPeopleWithFilters()
 }
 
 /**
@@ -98,26 +110,9 @@ export function getAllDepartments(): DepartmentNode[] {
  * Search people by name (requirement doesn't say by title or other person attributes)
  */
 export function searchPeople(searchTerm: string): PersonRecord[] {
-	const db = getDatabase()
-
 	if (!searchTerm.trim()) {
 		return []
 	}
 
-	const rows = db
-		.prepare(
-			`
-			SELECT
-				p.id, p.name, p.title, p.avatar_url,
-				d.id as dept_id, d.name as dept_name
-			FROM people p
-			LEFT JOIN departments d ON p.department_id = d.id
-			WHERE p.name LIKE ?
-			ORDER BY p.name
-			LIMIT 100
-		`
-		)
-		.all(`%${searchTerm}%`)
-
-	return rows.map(transformRowToPerson).filter(Boolean) as PersonRecord[]
+	return getPeopleWithFilters('WHERE p.name LIKE ?', [`%${searchTerm}%`])
 }
