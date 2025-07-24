@@ -163,8 +163,9 @@ export default function PeoplePage({
 		const timeoutId = setTimeout(fetchPeople, 500)
 		return () => clearTimeout(timeoutId)
 	}, [
+		// filteredDepartments is an array and compared by reference, effect should depend on the actual selected department string
+		filteredDepartments.length > 0 ? filteredDepartments.at(-1)?.id : null,
 		searchingName,
-		filteredDepartments,
 		router.isReady,
 		allPeople,
 		hideNoPicture,
