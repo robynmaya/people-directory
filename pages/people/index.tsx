@@ -47,19 +47,26 @@ export default function PeoplePage({
 	departmentTree,
 }: Props): React.ReactElement {
 	const router = useRouter()
-	const [peopleResults, setPeopleResults] = useState<PersonRecord[]>(allPeople)
+	const [peopleResults, setPeopleResults] = useState<PersonRecord[] | null>(
+		null
+	)
 	const [searchingName, setSearchingName] = useState('')
 	const [hideNoPicture, setHideNoPicture] = useState(false)
 	const [filteredDepartments, setFilteredDepartments] = useState([]) //  hierarchical path, last is selected dept
 	const [isInitialized, setIsInitialized] = useState(false)
 
 	// Initialize state from URL on page load in case bookmarked
-	// As per requirement, avatar is not in URL
 	useEffect(() => {
 		if (!router.isReady) {
 			return
 		}
 		const { search, department, hasImage } = router.query
+		const hasAnyFilters = search || department || hasImage
+
+		// If no URL filters, show all people immediately
+		if (!hasAnyFilters) {
+			setPeopleResults(allPeople)
+		}
 
 		// Set initial state from URL query
 		if (search) {
@@ -206,12 +213,12 @@ export default function PeoplePage({
 					/>
 				</aside>
 				<ul>
-					{peopleResults.length === 0 ? (
+					{peopleResults !== null && peopleResults.length === 0 ? (
 						<div>
 							<span>No results found.</span>
 						</div>
 					) : (
-						peopleResults.map((person: PersonRecord) => {
+						peopleResults?.map((person: PersonRecord) => {
 							return (
 								<li key={person.id}>
 									<Profile
