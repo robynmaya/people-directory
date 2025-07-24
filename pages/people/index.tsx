@@ -51,6 +51,8 @@ export default function PeoplePage({
 	const [searchingName, setSearchingName] = useState('')
 	const [hideNoPicture, setHideNoPicture] = useState(false)
 	const [filteredDepartments, setFilteredDepartments] = useState([]) //  hierarchical path, last is selected dept
+	const [isInitialized, setIsInitialized] = useState(false)
+	const [isLoading, setIsLoading] = useState(false)
 
 	// Initialize state from URL on page load in case bookmarked
 	// As per requirement, avatar is not in URL
@@ -84,20 +86,26 @@ export default function PeoplePage({
 		if (hasImage === 'required') {
 			setHideNoPicture(true)
 		}
+
+		setIsInitialized(true)
 	}, [router.isReady, router.query])
 
 	useEffect(() => {
-		if (!router.isReady) {
+		if (!router.isReady || !isInitialized) {
 			return
 		}
 
 		// If no filters at all, show all people from getStaticProps
 		if (!searchingName && filteredDepartments.length === 0 && !hideNoPicture) {
 			setPeopleResults(allPeople)
+			setIsLoading(false)
 			// Update URL to clear any previous params
 			router.replace('/people', undefined, { shallow: true })
 			return
 		}
+
+		// Only show loading when we're actually making an API call
+		setIsLoading(true)
 
 		// Function to fetch and update people via API when filtering
 		const fetchPeople = async () => {
@@ -143,9 +151,11 @@ export default function PeoplePage({
 				const response = await fetch(`/api/hashicorp?${params}`) // send combined params, but API doesn't need dept, only dept ids
 				const data = await response.json()
 				setPeopleResults(data.results)
+				setIsLoading(false)
 			} catch (error) {
 				console.error('Failed to fetch people:', error)
 				setPeopleResults([])
+				setIsLoading(false)
 			}
 		}
 
@@ -158,6 +168,7 @@ export default function PeoplePage({
 		router.isReady,
 		allPeople,
 		hideNoPicture,
+		isInitialized,
 	])
 
 	const filteredDepartmentIds = filteredDepartments.reduce(
@@ -201,23 +212,28 @@ export default function PeoplePage({
 					/>
 				</aside>
 				<ul>
-					{peopleResults.length === 0 && (
+					{isLoading ? (
+						<div>
+							<span>Loading...</span>
+						</div>
+					) : peopleResults.length === 0 ? (
 						<div>
 							<span>No results found.</span>
 						</div>
+					) : (
+						peopleResults.map((person: PersonRecord) => {
+							return (
+								<li key={person.id}>
+									<Profile
+										imgUrl={person.avatar?.url}
+										name={person.name}
+										title={person.title || 'No title'}
+										department={person.department?.name || 'No department'}
+									/>
+								</li>
+							)
+						})
 					)}
-					{peopleResults.map((person: PersonRecord) => {
-						return (
-							<li key={person.id}>
-								<Profile
-									imgUrl={person.avatar?.url}
-									name={person.name}
-									title={person.title || 'No title'}
-									department={person.department?.name || 'No department'}
-								/>
-							</li>
-						)
-					})}
 				</ul>
 			</div>
 		</main>
