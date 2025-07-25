@@ -60,6 +60,7 @@ export default function PeoplePage({
 		if (!router.isReady) {
 			return
 		}
+
 		const { search, department, hasImage } = router.query
 		const hasAnyFilters = search || department || hasImage
 
@@ -72,6 +73,7 @@ export default function PeoplePage({
 		if (search) {
 			setSearchingName(search as string)
 		}
+
 		if (department) {
 			// Department query param is always a single string because selection only allows 1 department
 			// findDepartments gives the full hierarchical path from root to selected department
@@ -184,16 +186,18 @@ export default function PeoplePage({
 					<h1>HashiCorp Humans</h1>
 					<span>Find a HashiCorp human</span>
 				</div>
-				<Search
-					value={searchingName}
-					hideNoPicture={hideNoPicture}
-					onInputChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-						setSearchingName(e.target.value)
-					}}
-					onProfileChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-						setHideNoPicture(e.target.checked)
-					}
-				/>
+				{router.isReady ? (
+					<Search
+						value={searchingName}
+						hideNoPicture={hideNoPicture}
+						onInputChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+							setSearchingName(e.target.value)
+						}}
+						onProfileChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+							setHideNoPicture(e.target.checked)
+						}
+					/>
+				) : null}
 			</div>
 			<div>
 				<aside>
