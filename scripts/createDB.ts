@@ -10,31 +10,15 @@
 import Database from 'better-sqlite3'
 import { executeQuery } from '@datocms/cda-client'
 import { PersonRecord, DepartmentNode } from '../types'
+import { readFileSync } from 'fs'
+import { join } from 'path'
 import 'dotenv/config'
 
-const query = `query {
-	allDepartments(first: 100) {
-		name
-		id
-		parent {
-			name
-			id
-		}
-	}
-
-	allPeople(first: 100) {
-		id
-		name
-		title
-		avatar {
-			url
-		}
-		department {
-			id
-			name
-		}
-	}
-}`
+// Read GraphQL query from file
+const query = readFileSync(
+	join(__dirname, '../pages/people/query.graphql'),
+	'utf8'
+)
 
 const DATO_API_TOKEN = process.env.DATO_API_TOKEN // the Dato API token is provided in the Google Doc we shared with you
 
