@@ -5,7 +5,7 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { PersonRecord } from 'types'
-import { searchPeople, getAllPeople } from '../../lib/database'
+import { searchPeople, getAllPeople } from '../../lib/peopleService'
 
 type ResponseData = {
 	results: PersonRecord[]

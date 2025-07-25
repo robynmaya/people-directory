@@ -8,7 +8,7 @@ import { GetStaticPropsResult } from 'next'
 import { useRouter } from 'next/router'
 import { PersonRecord, DepartmentNode, DepartmentTree, Department } from 'types'
 import BaseLayout from '../../layouts/base'
-import { getAllPeople, getAllDepartments } from 'lib/database'
+import { getAllPeople, getAllDepartments } from 'lib/peopleService'
 
 import {
 	findDepartments,
