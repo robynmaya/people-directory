@@ -1,0 +1,89 @@
+/* HashiCorp design system color usage */
+
+/* Component-specific design tokens */
+.searchContainer {
+	--brand-glow: color-mix(in sRGB, var(--brand) 10%, transparent);
+
+	display: flex;
+	flex-direction: column;
+	margin: 0 auto;
+	width: 100%;
+}
+
+.inputContainer {
+	position: relative;
+}
+
+.searchInput {
+	--search-icon: url('./img/search-icon.svg');
+
+	width: 100%;
+	height: 48px;
+	border: 1px solid var(--gray-5);
+	border-radius: 100px;
+	padding: 0 var(--wpl-spacing-02) 0 48px;
+	font-size: 16px; /* Prevents iOS zoom when focused */
+	outline: none;
+	transition: border-color 0.2s ease;
+	background: var(--search-icon) no-repeat 14px center / 20px 20px;
+
+&:focus {
+	/* Use global brand glow color for consistent focus states */
+	box-shadow: 0 0 0 2px var(--brand-glow);
+	border-color: var(--brand);
+}
+}
+
+.checkboxContainer {
+	margin-top: var(--wpl-spacing-03);
+}
+
+.checkboxLabel {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	font-size: 14px;
+	gap: var(--wpl-spacing-01); /* Space between checkbox and text */
+	color: var(--gray-3);
+}
+
+.checkbox {
+	width: 20px;
+	height: 20px;
+	border: 1px solid var(--brand);
+	border-radius: 3px;
+	cursor: pointer;
+	position: relative;
+	appearance: none; /* Removes default browser checkbox styling */
+	transition: all 0.2s ease;
+
+&:checked {
+	background-color: var(--brand);
+	border-color: var(--brand);
+
+&::after {
+	--checkmark-icon: url('./img/checkmark-icon.svg');
+
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 12px;
+	height: 10px;
+	background: var(--checkmark-icon) no-repeat center / contain;
+}
+}
+
+&:focus {
+	outline: 2px solid var(--brand-glow);
+	outline-offset: 2px;
+}
+}
+
+@media (min-width: 769px) {
+	.searchContainer {
+		width: auto; /* Let min-width control size on desktop */
+		min-width: 582px;
+	}
+}

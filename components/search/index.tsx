@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: MPL-2.0
  */
 
+import styles from './style.module.css'
+
 export interface SearchProps {
 	value: string
 	hideNoPicture: boolean
@@ -17,22 +19,31 @@ export default function Search({
 	onProfileChange,
 }: SearchProps) {
 	return (
-		<>
-			<input
-				type="text"
-				placeholder="Search people by name"
-				value={value}
-				onChange={onInputChange}
-			/>
-
-			<div>
+		<div className={styles.searchContainer}>
+			<div className={styles.inputContainer}>
 				<input
-					type="checkbox"
-					checked={hideNoPicture}
-					onChange={onProfileChange}
+					id="people-search"
+					type="text"
+					placeholder="Search people by name"
+					value={value}
+					onChange={onInputChange}
+					aria-label="Search people by name"
+					className={styles.searchInput}
+					autoComplete="off"
 				/>
-				<div>Hide people missing a profile image</div>
 			</div>
-		</>
+			<div className={styles.checkboxContainer}>
+				<label htmlFor="hide-no-picture" className={styles.checkboxLabel}>
+					<input
+						id="hide-no-picture"
+						type="checkbox"
+						checked={hideNoPicture}
+						onChange={onProfileChange}
+						className={styles.checkbox}
+					/>
+					Hide people missing a profile image
+				</label>
+			</div>
+		</div>
 	)
 }
