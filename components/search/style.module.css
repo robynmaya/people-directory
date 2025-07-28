@@ -109,9 +109,9 @@
 	}
 }
 
-@media (min-width: 48.0625rem) {
+@media (min-width: 768px) {
 	.searchContainer {
 		width: auto; /* Let min-width control size on desktop */
-		min-width: 36.375rem;
+		min-width: 582px;
 	}
 }

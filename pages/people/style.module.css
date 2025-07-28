@@ -63,7 +63,7 @@
 }
 
 /* Tablet and larger screens */
-@media (min-width: 481px) {
+@media (min-width: 768px) {
 	.container {
 		max-width: 100rem;
 		padding: 5rem;

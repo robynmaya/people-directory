@@ -241,7 +241,7 @@ export default function PeoplePage({
 				<ul className={s.profileGrid}>
 					{peopleResults !== null && peopleResults.length === 0
 						? null
-						: peopleResults?.map((person: PersonRecord) => {
+						: peopleResults?.map((person: PersonRecord, index: number) => {
 								return (
 									<li key={person.id}>
 										<Profile
@@ -249,6 +249,7 @@ export default function PeoplePage({
 											name={person.name}
 											title={person.title || 'No title'}
 											department={person.department?.name || 'No department'}
+											priority={index < 12} // first 12 Profile cards will have high priority loading
 										/>
 									</li>
 								)
