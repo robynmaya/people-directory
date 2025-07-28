@@ -20,6 +20,7 @@ import {
 import Profile from 'components/profile'
 import Search from 'components/search'
 import DepartmentFilter from 'components/departmentFilter'
+import MobileSheet from 'components/MobileSheet'
 import s from './style.module.css'
 
 interface Props {
@@ -56,6 +57,7 @@ export default function PeoplePage({
 	const [filteredDepartments, setFilteredDepartments] = useState([]) //  hierarchical path, last is selected dept
 	const [isInitialized, setIsInitialized] = useState(false)
 	const [isMounted, setIsMounted] = useState(false)
+	const [isFilterOpen, setIsFilterOpen] = useState(false) // mobile filter sheet state
 
 	// Hydration safety: Track when component mounts on client to prevent server/client DOM mismatch
 	useEffect(() => {
@@ -214,6 +216,31 @@ export default function PeoplePage({
 				)}
 			</header>
 			<div className={s.content}>
+				{/* Mobile filter button */}
+				{isMounted && isInitialized && (
+					<button
+						className={s.filterButton}
+						onClick={() => setIsFilterOpen(true)}
+						aria-label="Open filters"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="100%"
+							height="100%"
+							fill="none"
+							viewBox="0 0 16 16"
+							aria-hidden="true"
+							style={{ display: 'block' }}
+						>
+							<g fill="currentColor">
+								<path d="M1 3.75A.75.75 0 011.75 3h12.5a.75.75 0 010 1.5H1.75A.75.75 0 011 3.75zM3.5 7.75A.75.75 0 014.25 7h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM6.75 11a.75.75 0 000 1.5h2.5a.75.75 0 000-1.5h-2.5z"></path>
+							</g>
+						</svg>
+						Filters
+					</button>
+				)}
+
+				{/* Desktop sidebar */}
 				<aside className={s.sidebar}>
 					<DepartmentFilter
 						filteredDepartmentIds={filteredDepartmentIds}
@@ -230,6 +257,29 @@ export default function PeoplePage({
 						departmentTree={departmentTree}
 					/>
 				</aside>
+
+				{/* Mobile sheet */}
+				<MobileSheet
+					isOpen={isFilterOpen}
+					onClose={() => setIsFilterOpen(false)}
+				>
+					<DepartmentFilter
+						filteredDepartmentIds={filteredDepartmentIds}
+						clearFiltersHandler={() => {
+							setFilteredDepartments([])
+							setIsFilterOpen(false) // Close sheet after clearing
+						}}
+						selectFilterHandler={(departmentFilter: Department) => {
+							// Full hierarchical path from root down to selected department for breadcrumb
+							// eg select QA, gives array: [RootDept, ParentDept, QA]
+							setFilteredDepartments(
+								findDepartments(departmentTree, departmentFilter.id)
+							)
+							setIsFilterOpen(false) // Close sheet after selection
+						}}
+						departmentTree={departmentTree}
+					/>
+				</MobileSheet>
 
 				{/* No results message - positioned relative to content container */}
 				{peopleResults !== null && peopleResults.length === 0 && (
