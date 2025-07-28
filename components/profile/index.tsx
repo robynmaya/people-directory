@@ -13,6 +13,7 @@ export interface ProfileProps {
 	name: string
 	title?: string
 	department?: string
+	priority?: boolean
 }
 
 export default function Profile({
@@ -20,20 +21,33 @@ export default function Profile({
 	name,
 	title,
 	department,
+	priority = false,
 }: ProfileProps): ReactElement {
 	return (
-		<div className={s.card}>
-			<Image
-				priority
-				className={s.avatar}
-				src={imgUrl ? imgUrl : placeholderImage}
-				alt={imgUrl ? `headshot of ${name}` : 'placeholder headshot'}
-				width={104}
-				height={106}
-			/>
-			<span className={s.heading}>{name}</span>
-			{title ? <span className={s.subheading}>{title}</span> : null}
-			{department ? <span className={s.department}>{department}</span> : null}
-		</div>
+		<article className={s.card}>
+			{/* Priority for visible rows up to 12 cards, lazy load for rest, see People */}
+			{imgUrl ? (
+				<Image
+					className={s.avatar}
+					src={imgUrl}
+					alt={`headshot of ${name}`}
+					width={106}
+					height={106}
+					priority={priority}
+				/>
+			) : (
+				<Image
+					className={s.avatar}
+					src={placeholderImage}
+					alt="placeholder headshot"
+					width={106}
+					height={106}
+					unoptimized // placeholder image, bypass image optimization to remove dimension warnings
+				/>
+			)}
+			<h3 className={s.heading}>{name}</h3>
+			{title ? <p className={s.subheading}>{title}</p> : null}
+			{department ? <p className={s.department}>{department}</p> : null}
+		</article>
 	)
 }

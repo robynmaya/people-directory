@@ -9,20 +9,18 @@
 		align-items: flex-start;
 		display: flex;
 		flex-direction: column;
-		gap: 8px;
+		gap: var(--wpl-spacing-01);
 		min-width: 200px;
 		width: 100%;
 	}
 }
 
 .title {
-	font-family: Open Sans, sans-serif;
-	font-size: 16px;
+	font-size: 1rem;
 	font-weight: 600;
-	line-height: 28px;
-	text-align: center;
-	color: #373942;
-	margin: 0;
+	line-height: 1.75;
+	text-align: left;
+	color: var(--gray-3);
 }
 
 .clearFilterButton {
@@ -30,22 +28,15 @@
 		text-decoration: underline;
 	}
 
-	font-family: Open Sans, sans-serif;
-	font-size: 16px;
-	font-weight: 400;
-	height: 24px;
-	line-height: 24px;
-	text-align: left;
-	color: #1563ff;
+	color: var(--brand);
 	appearance: none;
 	border: none;
 	background: none;
 	display: flex;
 	align-items: center;
-	justify-content: flex-start;
-	gap: 8px;
+	gap: var(--wpl-spacing-01);
 	padding: 0;
-	margin-left: 4px;
+	margin-bottom: var(--wpl-spacing-02);
 }
 
 .notVisible {
@@ -53,53 +44,69 @@
 }
 
 .departmentFilterTreeContainer {
-	margin-left: 10px;
 	width: 100%;
-}
-
-.notRoot > ul {
-	border-left: 1px solid #e0e0e0;
-	margin-left: 10px;
+	border-top: 1px solid var(--gray-5);
+	padding-top: var(--wpl-spacing-02);
 }
 
 .departmentFilterTreeList {
 	list-style: none;
 	margin: 0;
-	padding-left: 8px;
+	padding: 0;
 }
 
-.departmentFilterTreeIext {
+.departmentItem {
+	margin-bottom: 0.125rem;
+}
+
+.departmentRow {
+	display: flex;
+	align-items: center;
+	gap: var(--wpl-spacing-01);
+	min-height: var(--wpl-spacing-06);
+}
+
+.notRoot > ul {
+	border-left: 1px solid var(--gray-5);
+	margin-left: 5px;
+	padding-left: var(--wpl-spacing-02);
+}
+
+.departmentFilterTreeText {
 	&:hover {
 		text-decoration: underline;
-		color: #1563ff;
+		color: var(--brand);
 	}
 
 	&[aria-pressed='true'] {
-		color: #1563ff;
+		color: var(--brand);
 	}
 
-	font-family: Open Sans, sans-serif;
-	font-size: 16px;
-	font-weight: 400;
-	line-height: 24px;
+	font-size: 1rem;
 	text-align: left;
-	color: #484848;
+	color: var(--gray-3);
 	appearance: none;
 	border: none;
 	background: none;
+	cursor: pointer;
+	flex: 1;
+	padding: 0;
 }
 
 .departmentFilterTreeToggleCaret {
+	--caret-icon: url('./img/caret-icon.svg');
+
 	appearance: none;
 	border: none;
-	background: none;
-	margin-left: -22px;
+	background: var(--caret-icon) no-repeat center / contain;
+	width: 0.625rem;
+	height: 1rem;
+	transition: transform 0.2s ease;
+	transform: rotate(0deg);
+	cursor: pointer;
+	flex-shrink: 0;
 }
 
 .caretIconOpen {
 	transform: rotate(90deg);
-}
-
-.caratIcon {
-	background-color: white;
 }

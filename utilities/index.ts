@@ -23,7 +23,7 @@ export const buildChildren = (
 	)
 }
 
-// TODO: There is a bug in this function that is causing the DepartmentFilter component to not render correctly
+// TODO: There is a bug in this function that is causing the DepartmentFilter component to not render correctly ✅
 export const departmentRecordsToDepartmentTree = (
 	departments: DepartmentNode[]
 ): DepartmentRecord[] => {
@@ -38,45 +38,15 @@ export const departmentRecordsToDepartmentTree = (
 				listWithChildren[currentItemParentId].children.push(
 					currentItemWithChildren
 				)
+			} else {
+				// If no parent, this is a root level department - add to nestedList
+				nestedList.push(currentItemWithChildren)
 			}
 
 			return nestedList
 		},
 		[] as DepartmentRecord[]
 	)
-}
-
-export const filterPeople = (
-	allPeople: PersonRecord[],
-	filteredName: string,
-	filterByPicture: boolean,
-	filteredDepartments: Department[]
-) => {
-	return allPeople.filter((person: PersonRecord) => {
-		if (filterByPicture && person.avatar?.url == null) {
-			return false
-		} else if (
-			filteredName !== '' &&
-			!person.name.toLowerCase().includes(filteredName.toLowerCase())
-		) {
-			return false
-		} else if (
-			filteredDepartments.length !== 0 &&
-			!filteredDepartments
-				.reduce(
-					(acc: string[], department: DepartmentNode) => [
-						...acc,
-						department.name,
-					],
-					[]
-				)
-				.includes(person.department.name)
-		) {
-			return false
-		}
-
-		return true
-	})
 }
 
 export const findDepartments = (
@@ -136,4 +106,25 @@ export const findChildrenDepartments = (
 	}
 
 	return foundDepartments
+}
+
+// AI-assisted: Created this helper function to find department by name for URL initialization
+// (Time constraint - needed quick implementation to convert URL query param to department object)
+export const findDepartmentByName = (
+	departmentTree: DepartmentTree,
+	departmentName: string
+): Department | null => {
+	for (const department of departmentTree) {
+		if (department.name.toLowerCase() === departmentName.toLowerCase()) {
+			return { id: department.id, name: department.name }
+		}
+		// Recursively search children
+		if (department.children && department.children.length > 0) {
+			const found = findDepartmentByName(department.children, departmentName)
+			if (found) {
+				return found
+			}
+		}
+	}
+	return null
 }

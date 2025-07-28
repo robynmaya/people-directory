@@ -5,12 +5,12 @@
 
 import { describe, test, expect } from '@jest/globals'
 import {
-	filterPeople,
 	findDepartments,
 	findChildrenDepartments,
 	buildChildren,
+	findDepartmentByName,
 } from '../utilities/index'
-import { PersonRecord, DepartmentTree, Department, DepartmentNode } from 'types'
+import { DepartmentTree, DepartmentNode } from 'types'
 
 describe('buildChildren', () => {
 	test('should return an empty object when given an empty list', () => {
@@ -30,96 +30,6 @@ describe('buildChildren', () => {
 			'1': { children: [], id: '1', name: 'Engineering', parent: null },
 			'2': { children: [], id: '2', name: 'Marketing', parent: null },
 		})
-	})
-})
-
-describe('filterPeople', () => {
-	const allPeople: PersonRecord[] = [
-		{
-			id: '1',
-			name: 'Aqsa',
-			avatar: { url: 'http://example.com/Aqsa.jpg' },
-			department: { id: '1', name: 'Engineering' },
-		},
-		{
-			id: '2',
-			name: 'Bob',
-			avatar: null,
-			department: { id: '2', name: 'Marketing' },
-		},
-		{
-			id: '3',
-			name: 'Sabi',
-			avatar: { url: 'http://example.com/Sabi.jpg' },
-			department: { id: '1', name: 'Engineering' },
-		},
-	]
-
-	test('should filter people by picture', () => {
-		const result = filterPeople(allPeople, '', true, [])
-		expect(result).toEqual([
-			{
-				id: '1',
-				name: 'Aqsa',
-				avatar: { url: 'http://example.com/Aqsa.jpg' },
-				department: { id: '1', name: 'Engineering' },
-			},
-			{
-				id: '3',
-				name: 'Sabi',
-				avatar: { url: 'http://example.com/Sabi.jpg' },
-				department: { id: '1', name: 'Engineering' },
-			},
-		])
-	})
-
-	test('should filter people by name', () => {
-		const result = filterPeople(allPeople, 'Aqsa', false, [])
-		expect(result).toEqual([
-			{
-				id: '1',
-				name: 'Aqsa',
-				avatar: { url: 'http://example.com/Aqsa.jpg' },
-				department: { id: '1', name: 'Engineering' },
-			},
-		])
-	})
-
-	test('should filter people by department', () => {
-		const filteredDepartments: Department[] = [{ id: '1', name: 'Engineering' }]
-		const result = filterPeople(allPeople, '', false, filteredDepartments)
-		expect(result).toEqual([
-			{
-				id: '1',
-				name: 'Aqsa',
-				avatar: { url: 'http://example.com/Aqsa.jpg' },
-				department: { id: '1', name: 'Engineering' },
-			},
-			{
-				id: '3',
-				name: 'Sabi',
-				avatar: { url: 'http://example.com/Sabi.jpg' },
-				department: { id: '1', name: 'Engineering' },
-			},
-		])
-	})
-
-	test('should filter people by name, picture, and department', () => {
-		const filteredDepartments: Department[] = [{ id: '1', name: 'Engineering' }]
-		const result = filterPeople(allPeople, 'Sabi', true, filteredDepartments)
-		expect(result).toEqual([
-			{
-				id: '3',
-				name: 'Sabi',
-				avatar: { url: 'http://example.com/Sabi.jpg' },
-				department: { id: '1', name: 'Engineering' },
-			},
-		])
-	})
-
-	test('should return all people if no filters are applied', () => {
-		const result = filterPeople(allPeople, '', false, [])
-		expect(result).toEqual(allPeople)
 	})
 })
 
@@ -259,5 +169,89 @@ describe('findChildrenDepartments', () => {
 	test('should handle an empty department tree', () => {
 		const result = findChildrenDepartments([], '1')
 		expect(result).toEqual([])
+	})
+})
+
+describe('findDepartmentByName', () => {
+	const departmentTree: DepartmentTree = [
+		{
+			id: '1',
+			name: 'Engineering',
+			parent: null,
+			children: [
+				{
+					id: '2',
+					name: 'Software',
+					parent: { id: '1', name: 'Engineering' },
+					children: [
+						{
+							id: '5',
+							name: 'Frontend',
+							parent: { id: '2', name: 'Software' },
+							children: [],
+						},
+						{
+							id: '6',
+							name: 'Backend',
+							parent: { id: '2', name: 'Software' },
+							children: [],
+						},
+					],
+				},
+				{
+					id: '3',
+					name: 'Hardware',
+					parent: { id: '1', name: 'Engineering' },
+					children: [],
+				},
+			],
+		},
+		{
+			id: '4',
+			name: 'Marketing',
+			parent: null,
+			children: [],
+		},
+	]
+
+	test('should find department by exact name match', () => {
+		const result = findDepartmentByName(departmentTree, 'Engineering')
+		expect(result).toEqual({ id: '1', name: 'Engineering' })
+	})
+
+	test('should find department by name case-insensitive', () => {
+		const result = findDepartmentByName(departmentTree, 'engineering')
+		expect(result).toEqual({ id: '1', name: 'Engineering' })
+	})
+
+	test('should find department by name with different case', () => {
+		const result = findDepartmentByName(departmentTree, 'MARKETING')
+		expect(result).toEqual({ id: '4', name: 'Marketing' })
+	})
+
+	test('should find nested department by name', () => {
+		const result = findDepartmentByName(departmentTree, 'Software')
+		expect(result).toEqual({ id: '2', name: 'Software' })
+	})
+
+	test('should find deeply nested department by name', () => {
+		const result = findDepartmentByName(departmentTree, 'Frontend')
+		expect(result).toEqual({ id: '5', name: 'Frontend' })
+	})
+
+	test('should return null if department is not found', () => {
+		const result = findDepartmentByName(departmentTree, 'NonExistent')
+		expect(result).toBeNull()
+	})
+
+	test('should handle empty department tree', () => {
+		const result = findDepartmentByName([], 'Engineering')
+		expect(result).toBeNull()
+	})
+
+	test('should handle partial name matches correctly', () => {
+		// Should not match partial names
+		const result = findDepartmentByName(departmentTree, 'Engine')
+		expect(result).toBeNull()
 	})
 })

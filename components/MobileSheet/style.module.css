@@ -1,0 +1,47 @@
+.overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: var(--black);
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.3s ease, visibility 0.3s ease;
+	z-index: 1000;
+
+&.open {
+	opacity: 0.5;
+	visibility: visible;
+}
+}
+
+.sheet {
+	position: fixed;
+	top: 0;
+	right: 0;
+	width: 280px;
+	max-width: 80vw;
+	height: 100vh;
+	background: var(--white);
+	box-shadow: none;
+	transform: translateX(100%);
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+	z-index: 1001;
+	overflow-y: auto;
+	padding: var(--wpl-spacing-13) var(--wpl-spacing-04) var(--wpl-spacing-04);
+
+&.open {
+	box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
+	transform: translateX(0);
+}
+}
+
+/* Force content to show in mobile sheet - override component media queries */
+.sheet > div {
+	display: flex !important;
+	flex-direction: column !important;
+	gap: var(--wpl-spacing-01) !important;
+	align-items: flex-start !important;
+	width: 100% !important;
+}
