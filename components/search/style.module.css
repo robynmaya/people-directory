@@ -109,7 +109,7 @@
 	}
 }
 
-@media (min-width: 768px) {
+@media (--medium-up) {
 	.searchContainer {
 		width: auto; /* Let min-width control size on desktop */
 		min-width: 582px;
