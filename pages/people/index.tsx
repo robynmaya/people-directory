@@ -20,6 +20,7 @@ import {
 import Profile from 'components/profile'
 import Search from 'components/search'
 import DepartmentFilter from 'components/departmentFilter'
+import s from './style.module.css'
 
 interface Props {
 	allPeople: PersonRecord[]
@@ -54,8 +55,14 @@ export default function PeoplePage({
 	const [hideNoPicture, setHideNoPicture] = useState(false)
 	const [filteredDepartments, setFilteredDepartments] = useState([]) //  hierarchical path, last is selected dept
 	const [isInitialized, setIsInitialized] = useState(false)
+	const [isMounted, setIsMounted] = useState(false)
 
-	// Initialize state from URL on page load in case bookmarked
+	// Hydration safety: Track when component mounts on client to prevent server/client DOM mismatch
+	useEffect(() => {
+		setIsMounted(true) // always false on the server, only true after hydration
+	}, [])
+
+	// Initialize state from URL params once router is ready
 	useEffect(() => {
 		if (!router.isReady) {
 			return
@@ -69,7 +76,7 @@ export default function PeoplePage({
 			setPeopleResults(allPeople)
 		}
 
-		// Set initial state from URL query
+		// Set initial state from URL query to prevent search input flashing
 		if (search) {
 			setSearchingName(search as string)
 		}
@@ -95,6 +102,7 @@ export default function PeoplePage({
 			setHideNoPicture(true)
 		}
 
+		// Mark as initialized once all URL params have been processed
 		setIsInitialized(true)
 	}, [router.isReady, router.query])
 
@@ -180,13 +188,16 @@ export default function PeoplePage({
 	)
 
 	return (
-		<main className="g-grid-container">
-			<div>
-				<div>
-					<h1>HashiCorp Humans</h1>
-					<span>Find a HashiCorp human</span>
-				</div>
-				{router.isReady ? (
+		<main className={s.container}>
+			<header className={s.header}>
+				<h1 className={s.title}>HashiCorp Humans</h1>
+				<span className={s.subtitle}>Find a HashiCorp human</span>
+				{/* 
+					Hydration 😵‍💫 safety: Only render Search component when:
+					1. isMounted = true (prevents server/client DOM mismatch)
+					2. isInitialized = true (states have been updated with URL params)
+				*/}
+				{isMounted && isInitialized && (
 					<Search
 						value={searchingName}
 						hideNoPicture={hideNoPicture}
@@ -197,10 +208,10 @@ export default function PeoplePage({
 							setHideNoPicture(e.target.checked)
 						}
 					/>
-				) : null}
-			</div>
-			<div>
-				<aside>
+				)}
+			</header>
+			<div className={s.content}>
+				<aside className={s.sidebar}>
 					<DepartmentFilter
 						filteredDepartmentIds={filteredDepartmentIds}
 						clearFiltersHandler={() => {
@@ -216,25 +227,29 @@ export default function PeoplePage({
 						departmentTree={departmentTree}
 					/>
 				</aside>
-				<ul>
-					{peopleResults !== null && peopleResults.length === 0 ? (
-						<div>
-							<span>No results found.</span>
-						</div>
-					) : (
-						peopleResults?.map((person: PersonRecord) => {
-							return (
-								<li key={person.id}>
-									<Profile
-										imgUrl={person.avatar?.url}
-										name={person.name}
-										title={person.title || 'No title'}
-										department={person.department?.name || 'No department'}
-									/>
-								</li>
-							)
-						})
-					)}
+
+				{/* No results message - positioned relative to content container */}
+				{peopleResults !== null && peopleResults.length === 0 && (
+					<div className={s.noResults}>
+						<span>No results found.</span>
+					</div>
+				)}
+
+				<ul className={s.profileGrid}>
+					{peopleResults !== null && peopleResults.length === 0
+						? null
+						: peopleResults?.map((person: PersonRecord) => {
+								return (
+									<li key={person.id}>
+										<Profile
+											imgUrl={person.avatar?.url}
+											name={person.name}
+											title={person.title || 'No title'}
+											department={person.department?.name || 'No department'}
+										/>
+									</li>
+								)
+						  })}
 				</ul>
 			</div>
 		</main>
