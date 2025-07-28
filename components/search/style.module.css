@@ -27,15 +27,17 @@
 	transition: border-color 0.2s ease;
 	background: var(--search-icon) no-repeat 14px center / 20px 20px;
 
-&:focus {
-	/* Use global brand glow color for consistent focus states */
-	box-shadow: 0 0 0 2px var(--brand-glow);
-	border-color: var(--brand);
-}
+	&:focus {
+		/* Use global brand glow color for consistent focus states */
+		box-shadow: 0 0 0 2px var(--brand-glow);
+		border-color: var(--brand);
+	}
 }
 
 .checkboxContainer {
 	margin-top: var(--wpl-spacing-03);
+	display: flex;
+	justify-content: center;
 }
 
 .checkboxLabel {
@@ -57,28 +59,28 @@
 	appearance: none; /* Removes default browser checkbox styling */
 	transition: all 0.2s ease;
 
-&:checked {
-	background-color: var(--brand);
-	border-color: var(--brand);
+	&:checked {
+		background-color: var(--brand);
+		border-color: var(--brand);
 
-&::after {
-	--checkmark-icon: url('./img/checkmark-icon.svg');
+		&::after {
+			--checkmark-icon: url('./img/checkmark-icon.svg');
 
-	content: '';
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 12px;
-	height: 10px;
-	background: var(--checkmark-icon) no-repeat center / contain;
-}
-}
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 12px;
+			height: 10px;
+			background: var(--checkmark-icon) no-repeat center / contain;
+		}
+	}
 
-&:focus {
-	outline: 2px solid var(--brand-glow);
-	outline-offset: 2px;
-}
+	&:focus {
+		outline: 2px solid var(--brand-glow);
+		outline-offset: 2px;
+	}
 }
 
 @media (min-width: 769px) {
