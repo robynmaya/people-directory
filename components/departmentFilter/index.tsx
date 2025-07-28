@@ -2,13 +2,12 @@
  * Copyright (c) HashiCorp, Inc.
  * SPDX-License-Identifier: MPL-2.0
  */
- 
+
 import { useState } from 'react'
 import s from './style.module.css'
 import Image from 'next/image'
 
 import xIcon from './img/xIcon.svg'
-import caratIcon from './img/carat.svg'
 import { Department, DepartmentRecord, DepartmentTree } from 'types'
 
 export interface DepartmentFilterProps {
@@ -39,7 +38,7 @@ export default function DepartmentFilter({
 					width={12}
 					height={12}
 					src={xIcon}
-					alt={''}
+					alt="Clear filters"
 					className={s.searchIcon}
 				/>
 				Clear Filters
@@ -80,47 +79,61 @@ const DepartmentFilterTree = ({
 	)
 
 	return (
-		<ul className={s.departmentFilterTreeList}>
+		<ul
+			className={s.departmentFilterTreeList}
+			role="tree"
+			aria-label="Department filter tree"
+		>
 			{departmentTree.map((department: DepartmentRecord) => {
 				const isSelected = filteredDepartmentIds.includes(department.id)
 
 				return (
-					<li key={department.id}>
-						{department.children.length > 0 && (
-							<button
-								aria-expanded={departmentChildrenOpen[department.id]}
-								className={s.departmentFilterTreeToggleCaret}
-								onClick={() => {
-									setDepartmentChildrenOpen({
-										...departmentChildrenOpen,
-										[department.id]: !departmentChildrenOpen[department.id],
-									})
-								}}
-							>
-								<Image
-									priority
-									width={10}
-									height={10}
-									src={caratIcon}
-									alt={`Open ${department.name} department's children`}
-									className={`${s.caratIcon} ${
+					<li
+						key={department.id}
+						className={s.departmentItem}
+						role="treeitem"
+						aria-expanded={
+							department.children.length > 0
+								? departmentChildrenOpen[department.id]
+								: undefined
+						}
+					>
+						<div className={s.departmentRow}>
+							{department.children.length > 0 && (
+								<button
+									aria-expanded={departmentChildrenOpen[department.id]}
+									aria-label={`${
+										departmentChildrenOpen[department.id]
+											? 'Collapse'
+											: 'Expand'
+									} ${department.name} subdepartments`}
+									className={`${s.departmentFilterTreeToggleCaret} ${
 										departmentChildrenOpen[department.id] ? s.caretIconOpen : ''
 									}`}
+									onClick={() => {
+										setDepartmentChildrenOpen({
+											...departmentChildrenOpen,
+											[department.id]: !departmentChildrenOpen[department.id],
+										})
+									}}
 								/>
+							)}
+							<button
+								onClick={() => {
+									selectFilterHandler({
+										id: department.id,
+										name: department.name,
+									})
+								}}
+								aria-pressed={isSelected}
+								aria-label={`${
+									isSelected ? 'Remove filter for' : 'Filter by'
+								} ${department.name} department`}
+								className={s.departmentFilterTreeText}
+							>
+								{department.name}
 							</button>
-						)}
-						<button
-							onClick={() => {
-								selectFilterHandler({
-									id: department.id,
-									name: department.name,
-								})
-							}}
-							aria-pressed={isSelected}
-							className={s.departmentFilterTreeIext}
-						>
-							{department.name}
-						</button>
+						</div>
 
 						{departmentChildrenOpen[department.id] && (
 							<div className={s.notRoot}>
