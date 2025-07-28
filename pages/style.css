@@ -9,7 +9,67 @@
 @import '../layouts/base/components/footer/style.css';
 @import '../layouts/base/components/nav/style.css';
 
-/* Global styles here */
+/*
+ * HashiCorp Design System Reference:
+ * From @hashicorp/mktg-global-styles
+ */
+
+/*
+ * WPL Spacing Tokens:
+ * From @hashicorp/mktg-global-styles/custom-properties/spacing.css
+ * cat node_modules/@hashicorp/mktg-global-styles/custom-properties/spacing.css
+ * --wpl-spacing-01: 8px;
+ * --wpl-spacing-02: 12px;
+ * --wpl-spacing-03: 16px;
+ * --wpl-spacing-04: 20px;
+ * --wpl-spacing-05: 24px;
+ * --wpl-spacing-06: 32px;
+ * --wpl-spacing-07: 40px;
+ * --wpl-spacing-08: 48px;
+ * --wpl-spacing-09: 56px;
+ * --wpl-spacing-10: 64px;
+ * --wpl-spacing-11: 72px;
+ * --wpl-spacing-12: 80px;
+ * --wpl-spacing-13: 88px;
+ * --wpl-spacing-14: 96px;
+ * --wpl-spacing-15: 128px;
+ */
+
+/*
+ * Color Tokens:
+ * From @hashicorp/mktg-global-styles/custom-properties/color.css
+ * cat node_modules/@hashicorp/mktg-global-styles/custom-properties/color.css | grep -E "(--gray-|--brand[^-]|--brand-|--white|--black)"
+ * 
+ * Gray Scale:
+ * --gray-1: #1d1e1f (darkest text)
+ * --gray-2: #343536 (dark text)
+ * --gray-3: #727274 (medium text)
+ * --gray-4: #bfbfc0 (light borders)
+ * --gray-5: #dbdbdc (lighter borders)
+ * --gray-6: #f2f2f3 (lightest background)
+ * --white: #ffffff
+ * --black: #000000
+ * 
+ * Brand Colors:
+ * --brand: #2e71e5 (primary CTA blue)
+ * --brand-secondary: #f2f2f3
+ * --brand-link: #2264d6
+ * --brand-link-on-dark: #4294ff
+ * --brand-text-on-primary: var(--white)
+ */
+
+/*
+ * Breakpoint Tokens:
+ * From @hashicorp/mktg-global-styles/custom-media.css
+ * cat node_modules/@hashicorp/mktg-global-styles/custom-media.css
+ * --small (max-width: 767px);
+ * --small-up (min-width: 0px);
+ * --medium (min-width: 768px) and (max-width: 1119px);
+ * --medium-up (min-width: 768px);
+ * --large (min-width: 1120px);
+ */
+
+/* Global styles */
 
 /* Reset and base styles */
 * {
