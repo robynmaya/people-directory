@@ -16,9 +16,11 @@
 
 .avatar {
 	border-radius: 50%;
-	height: 6.625rem;
 	margin-bottom: 0.5rem;
+	object-fit: cover;
 	width: 6.625rem;
+	height: 6.625rem;
+	aspect-ratio: 1;
 }
 
 .heading {
@@ -48,7 +50,6 @@
 	}
 
 	.avatar {
-		height: 6.875rem;
 		margin-bottom: 0.625rem;
 	}
 

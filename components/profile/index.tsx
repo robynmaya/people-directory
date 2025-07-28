@@ -25,15 +25,26 @@ export default function Profile({
 }: ProfileProps): ReactElement {
 	return (
 		<article className={s.card}>
-			{/* Priority for visible rows up to 12 cards, lazy load for rest */}
-			<Image
-				className={s.avatar}
-				src={imgUrl ? imgUrl : placeholderImage}
-				alt={imgUrl ? `headshot of ${name}` : 'placeholder headshot'}
-				width={104}
-				height={106}
-				priority={priority}
-			/>
+			{/* Priority for visible rows up to 12 cards, lazy load for rest, see People */}
+			{imgUrl ? (
+				<Image
+					className={s.avatar}
+					src={imgUrl}
+					alt={`headshot of ${name}`}
+					width={106}
+					height={106}
+					priority={priority}
+				/>
+			) : (
+				<Image
+					className={s.avatar}
+					src={placeholderImage}
+					alt="placeholder headshot"
+					width={106}
+					height={106}
+					unoptimized // placeholder image, bypass image optimization to remove dimension warnings
+				/>
+			)}
 			<h3 className={s.heading}>{name}</h3>
 			{title ? <p className={s.subheading}>{title}</p> : null}
 			{department ? <p className={s.department}>{department}</p> : null}
