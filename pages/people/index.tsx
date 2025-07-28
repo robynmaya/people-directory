@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react'
+import Head from 'next/head'
 import { GetStaticPropsResult } from 'next'
 import { useRouter } from 'next/router'
 import { PersonRecord, DepartmentNode, DepartmentTree, Department } from 'types'
@@ -190,123 +191,128 @@ export default function PeoplePage({
 	)
 
 	return (
-		<main className={s.container}>
-			<header className={s.header}>
-				<h1 className={s.title}>HashiCorp Humans</h1>
-				<span className={s.subtitle}>Find a HashiCorp human</span>
-				{/* 
+		<>
+			<Head>
+				<title>HashiCorp People Directory</title>
+			</Head>
+			<main className={s.container}>
+				<header className={s.header}>
+					<h1 className={s.title}>HashiCorp Humans</h1>
+					<span className={s.subtitle}>Find a HashiCorp human</span>
+					{/* 
 					Hydration 😵‍💫 safety: Only render Search component when:
 					1. isMounted = true (prevents server/client DOM mismatch)
 					2. isInitialized = true (states have been updated with URL params)
 				*/}
-				{isMounted && isInitialized && (
-					<Search
-						value={searchingName}
-						hideNoPicture={hideNoPicture}
-						onInputChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-							setSearchingName(e.target.value)
-						}}
-						onProfileChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-							setHideNoPicture(e.target.checked)
-						}
-						onClear={() => {
-							setSearchingName('')
-						}}
-					/>
-				)}
-			</header>
-			<div className={s.content}>
-				{/* Mobile filter button */}
-				{isMounted && isInitialized && (
-					<button
-						className={s.filterButton}
-						onClick={() => setIsFilterOpen(true)}
-						aria-label="Open filters"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="100%"
-							height="100%"
-							fill="none"
-							viewBox="0 0 16 16"
-							aria-hidden="true"
-							style={{ display: 'block' }}
+					{isMounted && isInitialized && (
+						<Search
+							value={searchingName}
+							hideNoPicture={hideNoPicture}
+							onInputChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+								setSearchingName(e.target.value)
+							}}
+							onProfileChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+								setHideNoPicture(e.target.checked)
+							}
+							onClear={() => {
+								setSearchingName('')
+							}}
+						/>
+					)}
+				</header>
+				<div className={s.content}>
+					{/* Mobile filter button */}
+					{isMounted && isInitialized && (
+						<button
+							className={s.filterButton}
+							onClick={() => setIsFilterOpen(true)}
+							aria-label="Open filters"
 						>
-							<g fill="currentColor">
-								<path d="M1 3.75A.75.75 0 011.75 3h12.5a.75.75 0 010 1.5H1.75A.75.75 0 011 3.75zM3.5 7.75A.75.75 0 014.25 7h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM6.75 11a.75.75 0 000 1.5h2.5a.75.75 0 000-1.5h-2.5z"></path>
-							</g>
-						</svg>
-						Filters
-					</button>
-				)}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="100%"
+								height="100%"
+								fill="none"
+								viewBox="0 0 16 16"
+								aria-hidden="true"
+								style={{ display: 'block' }}
+							>
+								<g fill="currentColor">
+									<path d="M1 3.75A.75.75 0 011.75 3h12.5a.75.75 0 010 1.5H1.75A.75.75 0 011 3.75zM3.5 7.75A.75.75 0 014.25 7h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM6.75 11a.75.75 0 000 1.5h2.5a.75.75 0 000-1.5h-2.5z"></path>
+								</g>
+							</svg>
+							Filters
+						</button>
+					)}
 
-				{/* Desktop sidebar */}
-				<aside className={s.sidebar}>
-					<DepartmentFilter
-						filteredDepartmentIds={filteredDepartmentIds}
-						clearFiltersHandler={() => {
-							setFilteredDepartments([])
-						}}
-						selectFilterHandler={(departmentFilter: Department) => {
-							// Full hierarchical path from root down to selected department for breadcrumb
-							// eg select QA, gives array: [RootDept, ParentDept, QA]
-							setFilteredDepartments(
-								findDepartments(departmentTree, departmentFilter.id)
-							)
-						}}
-						departmentTree={departmentTree}
-					/>
-				</aside>
-
-				{/* Mobile sheet */}
-				<MobileSheet
-					isOpen={isFilterOpen}
-					onClose={() => setIsFilterOpen(false)}
-				>
-					<DepartmentFilter
-						filteredDepartmentIds={filteredDepartmentIds}
-						clearFiltersHandler={() => {
-							setFilteredDepartments([])
-							setIsFilterOpen(false) // Close sheet after clearing
-						}}
-						selectFilterHandler={(departmentFilter: Department) => {
-							// Full hierarchical path from root down to selected department for breadcrumb
-							// eg select QA, gives array: [RootDept, ParentDept, QA]
-							setFilteredDepartments(
-								findDepartments(departmentTree, departmentFilter.id)
-							)
-							setIsFilterOpen(false) // Close sheet after selection
-						}}
-						departmentTree={departmentTree}
-					/>
-				</MobileSheet>
-
-				{/* No results message - positioned relative to content container */}
-				{peopleResults !== null && peopleResults.length === 0 && (
-					<div className={s.noResults}>
-						<span>No results found.</span>
-					</div>
-				)}
-
-				<ul className={s.profileGrid}>
-					{peopleResults !== null && peopleResults.length === 0
-						? null
-						: peopleResults?.map((person: PersonRecord, index: number) => {
-								return (
-									<li key={person.id}>
-										<Profile
-											imgUrl={person.avatar?.url}
-											name={person.name}
-											title={person.title || 'No title'}
-											department={person.department?.name || 'No department'}
-											priority={index < 12} // first 12 Profile cards will have high priority loading
-										/>
-									</li>
+					{/* Desktop sidebar */}
+					<aside className={s.sidebar}>
+						<DepartmentFilter
+							filteredDepartmentIds={filteredDepartmentIds}
+							clearFiltersHandler={() => {
+								setFilteredDepartments([])
+							}}
+							selectFilterHandler={(departmentFilter: Department) => {
+								// Full hierarchical path from root down to selected department for breadcrumb
+								// eg select QA, gives array: [RootDept, ParentDept, QA]
+								setFilteredDepartments(
+									findDepartments(departmentTree, departmentFilter.id)
 								)
-						  })}
-				</ul>
-			</div>
-		</main>
+							}}
+							departmentTree={departmentTree}
+						/>
+					</aside>
+
+					{/* Mobile sheet */}
+					<MobileSheet
+						isOpen={isFilterOpen}
+						onClose={() => setIsFilterOpen(false)}
+					>
+						<DepartmentFilter
+							filteredDepartmentIds={filteredDepartmentIds}
+							clearFiltersHandler={() => {
+								setFilteredDepartments([])
+								setIsFilterOpen(false) // Close sheet after clearing
+							}}
+							selectFilterHandler={(departmentFilter: Department) => {
+								// Full hierarchical path from root down to selected department for breadcrumb
+								// eg select QA, gives array: [RootDept, ParentDept, QA]
+								setFilteredDepartments(
+									findDepartments(departmentTree, departmentFilter.id)
+								)
+								setIsFilterOpen(false) // Close sheet after selection
+							}}
+							departmentTree={departmentTree}
+						/>
+					</MobileSheet>
+
+					{/* No results message - positioned relative to content container */}
+					{peopleResults !== null && peopleResults.length === 0 && (
+						<div className={s.noResults}>
+							<span>No results found.</span>
+						</div>
+					)}
+
+					<ul className={s.profileGrid}>
+						{peopleResults !== null && peopleResults.length === 0
+							? null
+							: peopleResults?.map((person: PersonRecord, index: number) => {
+									return (
+										<li key={person.id}>
+											<Profile
+												imgUrl={person.avatar?.url}
+												name={person.name}
+												title={person.title || 'No title'}
+												department={person.department?.name || 'No department'}
+												priority={index < 12} // first 12 Profile cards will have high priority loading
+											/>
+										</li>
+									)
+							  })}
+					</ul>
+				</div>
+			</main>
+		</>
 	)
 }
 
