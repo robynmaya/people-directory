@@ -207,6 +207,9 @@ export default function PeoplePage({
 						onProfileChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 							setHideNoPicture(e.target.checked)
 						}
+						onClear={() => {
+							setSearchingName('')
+						}}
 					/>
 				)}
 			</header>

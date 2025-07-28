@@ -10,6 +10,7 @@ export interface SearchProps {
 	hideNoPicture: boolean
 	onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 	onProfileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+	onClear: () => void
 }
 
 export default function Search({
@@ -17,6 +18,7 @@ export default function Search({
 	hideNoPicture,
 	onInputChange,
 	onProfileChange,
+	onClear,
 }: SearchProps) {
 	return (
 		<div className={s.searchContainer}>
@@ -31,6 +33,16 @@ export default function Search({
 					className={s.searchInput}
 					autoComplete="off"
 				/>
+				{value && (
+					<button
+						type="button"
+						className={s.clearButton}
+						onClick={onClear}
+						aria-label="Clear search"
+					>
+						×
+					</button>
+				)}
 			</div>
 			<div className={s.checkboxContainer}>
 				<label htmlFor="hide-no-picture" className={s.checkboxLabel}>

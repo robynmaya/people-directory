@@ -1,6 +1,5 @@
 /* HashiCorp design system color usage */
 
-/* Component-specific design tokens */
 .searchContainer {
 	--brand-glow: color-mix(in sRGB, var(--brand) 10%, transparent);
 
@@ -18,19 +17,46 @@
 	--search-icon: url('./img/search-icon.svg');
 
 	width: 100%;
-	height: 48px;
+	height: 3rem;
 	border: 1px solid var(--gray-5);
-	border-radius: 100px;
-	padding: 0 var(--wpl-spacing-02) 0 48px;
-	font-size: 16px; /* Prevents iOS zoom when focused */
+	border-radius: 6.25rem;
+	padding: 0 var(--wpl-spacing-02) 0 3rem;
+	font-size: 1rem; /* Prevents iOS zoom when focused */
 	outline: none;
 	transition: border-color 0.2s ease;
-	background: var(--search-icon) no-repeat 14px center / 20px 20px;
+	background: var(--search-icon) no-repeat 0.875rem center / 1.25rem 1.25rem;
 
 	&:focus {
-		/* Use global brand glow color for consistent focus states */
 		box-shadow: 0 0 0 2px var(--brand-glow);
 		border-color: var(--brand);
+	}
+}
+
+.clearButton {
+	position: absolute;
+	right: 0.75rem;
+	top: 50%;
+	transform: translateY(-50%);
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0.5rem;
+	display: flex;
+	justify-content: center;
+	color: var(--gray-3);
+	border-radius: 0.25rem;
+	transition: all 0.2s ease;
+	font-size: 1.125rem;
+	line-height: 1;
+
+	&:hover {
+		background-color: var(--gray-5);
+		color: var(--gray-1);
+	}
+
+	&:focus {
+		outline: 2px solid var(--brand-glow);
+		outline-offset: 2px;
 	}
 }
 
@@ -44,16 +70,16 @@
 	display: flex;
 	align-items: center;
 	cursor: pointer;
-	font-size: 14px;
+	font-size: 0.875rem;
 	gap: var(--wpl-spacing-01); /* Space between checkbox and text */
 	color: var(--gray-3);
 }
 
 .checkbox {
-	width: 20px;
-	height: 20px;
+	width: 1.25rem;
+	height: 1.25rem;
 	border: 1px solid var(--brand);
-	border-radius: 3px;
+	border-radius: 0.1875rem;
 	cursor: pointer;
 	position: relative;
 	appearance: none; /* Removes default browser checkbox styling */
@@ -71,8 +97,8 @@
 			top: 50%;
 			left: 50%;
 			transform: translate(-50%, -50%);
-			width: 12px;
-			height: 10px;
+			width: 0.75rem;
+			height: 0.625rem;
 			background: var(--checkmark-icon) no-repeat center / contain;
 		}
 	}
@@ -83,9 +109,9 @@
 	}
 }
 
-@media (min-width: 769px) {
+@media (min-width: 48.0625rem) {
 	.searchContainer {
 		width: auto; /* Let min-width control size on desktop */
-		min-width: 582px;
+		min-width: 36.375rem;
 	}
 }
